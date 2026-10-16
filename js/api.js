@@ -1,6 +1,6 @@
 import { API_URL } from './config.js';
 
-const TOKEN_KEY = 'moro.token';
+const TOKEN_KEY = 'moro-div.token';
 
 export class ApiError extends Error {
   constructor(code, detail) { super(code); this.code = code; this.detail = detail || ''; }

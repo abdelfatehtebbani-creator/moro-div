@@ -31,7 +31,7 @@ export function showAuth(root, setupNeeded) {
     function loginForm() {
       const user = trackFilled(h('input.input#username', { autocomplete: 'username', autocapitalize: 'none', spellcheck: 'false' }));
       const pin = trackFilled(h('input.input.pin#pin', { type: 'password', inputmode: 'numeric', autocomplete: 'current-password', maxlength: 8 }));
-      try { user.value = localStorage.getItem('moro.lastUser') || ''; } catch { /* ignore */ }
+      try { user.value = localStorage.getItem('moro-div.lastUser') || ''; } catch { /* ignore */ }
       user.dispatchEvent(new Event('input'));
       const err = h('p.err-text', '');
       const btn = h('button.btn.block', { type: 'submit' }, t('login'));
@@ -44,7 +44,7 @@ export function showAuth(root, setupNeeded) {
         try {
           const r = await call('auth.login', { username: user.value, pin: pin.value });
           session.token = r.token;
-          try { localStorage.setItem('moro.lastUser', user.value.trim().toLowerCase()); } catch { /* ignore */ }
+          try { localStorage.setItem('moro-div.lastUser', user.value.trim().toLowerCase()); } catch { /* ignore */ }
           resolve(r.user);
         } catch (ex) {
           err.textContent = errText(ex);
@@ -72,7 +72,7 @@ export function showAuth(root, setupNeeded) {
           await call('auth.setup', { username: user.value, display_name: name.value, pin: pin.value });
           const r = await call('auth.login', { username: user.value, pin: pin.value });
           session.token = r.token;
-          try { localStorage.setItem('moro.lastUser', user.value.trim().toLowerCase()); } catch { /* ignore */ }
+          try { localStorage.setItem('moro-div.lastUser', user.value.trim().toLowerCase()); } catch { /* ignore */ }
           resolve(r.user);
         } catch (ex) {
           err.textContent = errText(ex);

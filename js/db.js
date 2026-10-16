@@ -1,5 +1,5 @@
 // Tiny key/value store on IndexedDB: the device's offline copy of the data.
-const DB_NAME = 'moro';
+const DB_NAME = 'moro-div';
 const STORE = 'kv';
 let dbp = null;
 

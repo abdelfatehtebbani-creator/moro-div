@@ -578,7 +578,7 @@ const DICT = {
   },
 };
 
-const LANG_KEY = 'moro.lang';
+const LANG_KEY = 'moro-div.lang';
 let lang = (() => { try { return localStorage.getItem(LANG_KEY) || 'ar'; } catch { return 'ar'; } })();
 
 export function getLang() { return lang; }

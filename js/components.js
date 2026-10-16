@@ -126,7 +126,7 @@ export function storePicker(onChange) {
   const allowed = Data.myStores();
   // the last store used on this device, else Dry foods, else the first one allowed
   let last = '';
-  try { last = localStorage.getItem('moro.store') || ''; } catch { /* private window */ }
+  try { last = localStorage.getItem('moro-div.store') || ''; } catch { /* private window */ }
   let value = allowed.includes(last) ? last : allowed.includes('DRY') ? 'DRY' : allowed[0] || '';
   let locked = false;
   const btns = STORES.map((s) => h('button.zone-btn', { type: 'button', 'data-store': s, disabled: !allowed.includes(s),
@@ -137,7 +137,7 @@ export function storePicker(onChange) {
     value = store;
     btns.forEach((b) => b.classList.toggle('on', b.dataset.store === store));
     document.body.dataset.zone = store.toLowerCase();
-    try { localStorage.setItem('moro.store', store); } catch { /* private window */ }
+    try { localStorage.setItem('moro-div.store', store); } catch { /* private window */ }
     if (!silent) { flash(btns[STORES.indexOf(store)], true); onChange(store); }
   }
   const onKey = (e) => {

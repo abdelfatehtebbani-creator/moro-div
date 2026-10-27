@@ -2,7 +2,7 @@
 // development server (tests/devserver.js), which runs the same server code on test data.
 const PROD_API = 'https://script.google.com/macros/s/AKfycbyVmnMLpT1Lv6vUlpKpuDT3-rwfk0DkQpMA_NSOO8B9KMSqvtO4sZb-TKY_MIPrzh3G/exec';
 export const API_URL = 'https://script.google.com/macros/s/AKfycbxxek05XE5aHud3jDzpP3GLpyfViaX-xIicpobOb_UGFv01qz9g8BkZqdzwBSB97MeRQg/exec';   // MORO DIV (test copy)
-export const APP_VERSION = '0.9.42';
+export const APP_VERSION = '0.9.43';
 // Firebase web config and the public VAPID key, for phone / computer notifications (public by design;
 // the secret service-account key is kept in the server's Script Properties). null = notifications off.
 export const FIREBASE = {

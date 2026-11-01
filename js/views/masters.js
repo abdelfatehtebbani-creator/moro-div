@@ -45,12 +45,7 @@ function items(body, isAdmin) {
   const search = trackFilled(h('input.input#m-search', { type: 'search', placeholder: t('lookup_hint') }));
   const showInactive = h('input#m-inactive', { type: 'checkbox' });
   const deptFilter = h('select.input#m-dept', h('option', { value: '' }, t('all_depts')),
-<<<<<<< HEAD
-    [...Data.parties.values()].filter((p) => p.kind === 'section' && p.active === true).sort((a, b) => a.name.localeCompare(b.name))
-      .map((p) => h('option', { value: p.party_id }, p.name)));
-=======
     Data.producingDepts().map((p) => h('option', { value: p.party_id }, p.name)));
->>>>>>> feat/orders
   const tb = h('tbody');
   const fill = () => {
     const q = search.value.trim().toLowerCase();

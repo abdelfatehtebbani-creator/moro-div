@@ -1,6 +1,10 @@
 /* Service worker: keeps the app shell available offline. Data never goes through here –
    it is cached in IndexedDB by the app (js/db.js). Bump VERSION on every release. */
+<<<<<<< HEAD
 const VERSION = 'moro-v0.9.87-div';
+=======
+const VERSION = 'moro-v0.9.88';
+>>>>>>> feat/orders
 const SHELL = [
   './', 'index.html', 'manifest.webmanifest', 'css/app.css',
   'js/app.js', 'js/config.js', 'js/api.js', 'js/db.js', 'js/i18n.js', 'js/ui.js', 'js/data.js',

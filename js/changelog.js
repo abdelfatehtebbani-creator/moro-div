@@ -3,6 +3,11 @@
 //   todo: for everyone; admin: only for users who manage users (the admin).
 export const CHANGELOG = [
   {
+    v: '0.9.106', date: '2026-11-02',
+    ar: { news: ['(نسخة التطوير) اعتماد الطلبيات: رقم على كل تبويب بعدد طلبياته (بانتظار الاعتماد، قيد التجهيز، جاهزة للتوزيع)، وعلى "مرفوضة" عدد ما رُفض منذ آخر فتح لها. يتحدّث مع كل تغيير.'] },
+    en: { news: ['(Development copy) Approve orders: a number on each tab with its orders (waiting, being prepared, ready), and on "Rejected" those rejected since it was last opened. It follows every change.'] },
+  },
+  {
     v: '0.9.105', date: '2026-11-02',
     ar: { news: ['(نسخة التطوير) إصلاح: طلبيتان في اللحظة نفسها كانتا تأخذان الرقم نفسه. كل رقم (طلبية، حركة، رحلة، فاتورة…) يُقرأ الآن من جديد داخل القفل.'] },
     en: { news: ['(Development copy) Fix: two orders at the same moment took the same number. Every counter (order, movement, trip, invoice…) is now read afresh inside the lock.'] },
@@ -66,6 +71,11 @@ export const CHANGELOG = [
     v: '0.9.83', date: '2026-11-01',
     ar: { news: ['(نسخة التطوير) طلبيات المحلات داخل مورو، المرحلة 1: الكاشير يكتب طلبية محله ويرسلها لليوم الموالي، ومسؤول التوزيع يعتمدها، وكل سطر يذهب لقسمه المنتِج أو لمخزنه في "طلبيات المحلات"، بتبويبات لكل قسم ومخزن.'] },
     en: { news: ['(Development copy) Shop orders inside MORO, stage 1: the cashier writes the shop’s order for the next day, distribution approves it, and each line goes to the department that makes it or to its store in "Shop orders", with a tab per department and store.'] },
+  },
+  {
+    v: '0.9.83', date: '2026-11-02',
+    ar: { news: ['إصلاح: عمليتان محفوظتان في اللحظة نفسها لم تعودا تأخذان الرقم نفسه.'] },
+    en: { news: ['Fix: two operations saved at the same moment no longer take the same number.'] },
   },
   {
     v: '0.9.82', date: '2026-11-01',

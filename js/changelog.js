@@ -3,14 +3,19 @@
 //   todo: for everyone; admin: only for users who manage users (the admin).
 export const CHANGELOG = [
   {
+    v: '0.9.186', date: '2026-11-09',
+    ar: { news: ['(نسخة التطوير) الدليل: شرح الشاشة التي فتحته منها يظهر أولًا في إطار مميز، ثم فصول دورك، والأساسيات ودورة الطلبية والتقارير والمصطلحات في الآخر.'] },
+    en: { news: ['(Development copy) The guide: the screen you opened it from comes first, in a framed box, then the chapters of your role, and the basics, the order cycle, reports and terms last.'] },
+  },
+  {
     v: '0.9.185', date: '2026-11-09',
-    ar: { news: ['(نسخة التطوير) الدليل: زر "؟" يفتحه، وداخله يصير "✕" فيعيدك إلى الشاشة التي كنت فيها.'] },
-    en: { news: ['(Development copy) The guide: "?" opens it, and inside it the button becomes "✕" and takes you back to the screen you were on.'] },
+    ar: { news: ['الدليل: زر "؟" يفتحه، وداخله يصير "✕" فيعيدك إلى الشاشة التي كنت فيها.'] },
+    en: { news: ['The guide: "?" opens it, and inside it the button becomes "✕" and takes you back to the screen you were on.'] },
   },
   {
     v: '0.9.184', date: '2026-11-09',
-    ar: { news: ["(نسخة التطوير) الدليل داخل التطبيق: صفحة \"الدليل\" تعرض شرح شاشات دورك وعملك اليومي، مع بحث. وزر \"؟\" أعلى كل شاشة يفتح الفصل الذي يشرحها. بالإنجليزية: الأساسيات ودورة الطلبية والسائق والأقسام المنتجة والمحاسب والمشتريات، وبقية الفصول تظهر بالعربية حتى تُترجم."] },
-    en: { news: ["(Development copy) The guide inside the app: a \"Guide\" page explains your role's screens and daily work, with a search, and the \"?\" at the top of every screen opens the chapter for it. In English: the basics, the order cycle, the driver, the producing departments, the accountant and purchasing; the other chapters show in Arabic until translated."] },
+    ar: { news: ["الدليل داخل التطبيق: صفحة \"الدليل\" تعرض شرح شاشات دورك وعملك اليومي، مع بحث. وزر \"؟\" أعلى كل شاشة يفتح الفصل الذي يشرحها. بالإنجليزية: الأساسيات ودورة الطلبية والسائق والأقسام المنتجة والمحاسب والمشتريات، وبقية الفصول تظهر بالعربية حتى تُترجم."] },
+    en: { news: ["The guide inside the app: a \"Guide\" page explains your role's screens and daily work, with a search, and the \"?\" at the top of every screen opens the chapter for it. In English: the basics, the order cycle, the driver, the producing departments, the accountant and purchasing; the other chapters show in Arabic until translated."] },
   },
   {
     v: '0.9.183', date: '2026-11-09',

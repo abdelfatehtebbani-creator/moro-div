@@ -3,14 +3,19 @@
 //   todo: for everyone; admin: only for users who manage users (the admin).
 export const CHANGELOG = [
   {
+    v: '0.9.231', date: '2026-11-15',
+    ar: {"news": ["(نسخة التطوير) أكياس القهوة ← «تجهيز الأكياس» صار ثلاث خطوات، كل واحدة في يومها: 1) سحب البن الأخضر للتحميص (يخرج من المخزن وتُفتح دفعة «في التحميص»)، 2) ناتج التحميص والطحن (يدخل المخزن كـ Coffee Powder For Packaging ويُحسب فاقد التحميص)، 3) تعبئة الأكياس من المطحون (يُخصم المطحون والأكياس الفارغة وتدخل الأكياس الجاهزة، ويُحسب هدر الكيس). «المخزون والسجل» يعرض دفعات التحميص ثم التعبئة."]},
+    en: {"news": ["(Development copy) Coffee bags → Prepare bags is now three steps, each on its own day: 1) green coffee taken for roasting (leaves the stock, a roast opens), 2) roasted and ground (goes in as Coffee Powder For Packaging, the roasting loss is worked out), 3) bags packed from the ground coffee (ground coffee and empty pouches taken, bags in, waste per bag worked out). Stock and log shows the roasts, then the packings."]},
+  },
+  {
     v: '0.9.230', date: '2026-11-14',
-    ar: {"news": ["(نسخة التطوير) «صرف للأقسام»: مربع جديد «إرجاع من القسم إلى المخزن». يختار أمين المخزن القسم والمادة والكمية، فتزيد في رصيد المخزن، ويظهر في السجل «↩ مرتجع من قسم» بكمية موجبة، ويُطرح مما صُرف للقسم في التقارير."]},
-    en: {"news": ["(Development copy) Department issues: a new box \"Return from the department to the store\". The storekeeper picks the department, the item and the quantity; the store's stock goes up, the record shows \"↩ Return from dept.\" with a plus quantity, and the reports take it off what the department was issued."]},
+    ar: {"news": ["«صرف للأقسام»: مربع جديد «إرجاع من القسم إلى المخزن». يختار أمين المخزن القسم والمادة والكمية، فتزيد في رصيد المخزن، ويظهر في السجل «↩ مرتجع من قسم» بكمية موجبة، ويُطرح مما صُرف للقسم في التقارير."]},
+    en: {"news": ["Department issues: a new box \"Return from the department to the store\". The storekeeper picks the department, the item and the quantity; the store's stock goes up, the record shows \"↩ Return from dept.\" with a plus quantity, and the reports take it off what the department was issued."]},
   },
   {
     v: '0.9.229', date: '2026-11-14',
-    ar: {"news": ["(نسخة التطوير) إنشاء الحساب ذاتيًا: المدير يرفع قائمة العمال (الاسم، رقم البطاقة QID، الوظيفة) من «المستخدمون» ← «إعدادات عامة» ← «قائمة العمال»، ويُحفظ رقم البطاقة مشفّرًا. في شاشة الدخول «ليس لديك حساب؟»: يكتب العامل رقم بطاقته فيظهر اسمه، يختار قسمه واسم مستخدم ورمزًا، فيُنشأ حسابه ويدخل. الشيف يأخذ تجهيز الطلبيات (الشاشة، التسليم للتوزيع، لا يمكن توفيره) والإنتاج (الشاشة، تسجيل إنتاج) وطلبات الأقسام (الشاشة، إنشاء طلب)، والمساعد طلبات الأقسام فقط. لكل عامل حساب واحد."]},
-    en: {"news": ["(Development copy) Opening one's own account: the admin uploads the workers list (name, ID card QID, job) in Users → General settings → Workers list; the card number is kept hashed. On the sign-in screen, \"No account?\": a worker types their card number, sees their name, picks their department, a username and a PIN; the account is made and they are signed in. A chef gets preparing orders (screen, hand to distribution, cannot be provided), production (screen, record) and department requests (screen, create); an assistant department requests only. One account per worker."]},
+    ar: {"news": ["إنشاء الحساب ذاتيًا: المدير يرفع قائمة العمال (الاسم، رقم البطاقة QID، الوظيفة) من «المستخدمون» ← «إعدادات عامة» ← «قائمة العمال»، ويُحفظ رقم البطاقة مشفّرًا. في شاشة الدخول «ليس لديك حساب؟»: يكتب العامل رقم بطاقته فيظهر اسمه، يختار قسمه واسم مستخدم ورمزًا، فيُنشأ حسابه ويدخل. الشيف يأخذ تجهيز الطلبيات (الشاشة، التسليم للتوزيع، لا يمكن توفيره) والإنتاج (الشاشة، تسجيل إنتاج) وطلبات الأقسام (الشاشة، إنشاء طلب)، والمساعد طلبات الأقسام فقط. لكل عامل حساب واحد."]},
+    en: {"news": ["Opening one's own account: the admin uploads the workers list (name, ID card QID, job) in Users → General settings → Workers list; the card number is kept hashed. On the sign-in screen, \"No account?\": a worker types their card number, sees their name, picks their department, a username and a PIN; the account is made and they are signed in. A chef gets preparing orders (screen, hand to distribution, cannot be provided), production (screen, record) and department requests (screen, create); an assistant department requests only. One account per worker."]},
   },
   {
     v: '0.9.228', date: '2026-11-14',

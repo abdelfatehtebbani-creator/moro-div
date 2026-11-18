@@ -3,14 +3,19 @@
 //   todo: for everyone; admin: only for users who manage users (the admin).
 export const CHANGELOG = [
   {
+    v: '0.9.263', date: '2026-11-18',
+    ar: {"news": ["(نسخة التطوير) الجهاز المشترك: الشاشة لا تتجاوز عرض الجهاز (يظهر الجانب الأيمن وزر الإرسال وزر الخروج كاملين)، وقائمة «المطلوب» تعرض كل الأصناف وتُسحب بالإصبع للأعلى والأسفل، وآخر صنف مضاف يبقى ظاهرًا."]},
+    en: {"news": ["(Development copy) The shared device: the screen never goes wider than the device (the right side, Send and Sign out show in full); the asked-for list shows every line and scrolls with a finger, the last line added stays in view."]},
+  },
+  {
     v: '0.9.262', date: '2026-11-18',
-    ar: {"news": ["(نسخة التطوير) الجهاز المشترك: لوحة المفاتيح تظهر في كل بحث لا في أوله فقط، وزر «خروج» يبقى ظاهرًا مهما طال الاسم (يُختصر الاسم الطويل)."]},
-    en: {"news": ["(Development copy) The shared device: the on-screen keyboard opens on every search, not only the first; \"Sign out\" always stays on screen however long the name (a long name is shortened)."]},
+    ar: {"news": ["الجهاز المشترك: لوحة المفاتيح تظهر في كل بحث لا في أوله فقط، وزر «خروج» يبقى ظاهرًا مهما طال الاسم (يُختصر الاسم الطويل)."]},
+    en: {"news": ["The shared device: the on-screen keyboard opens on every search, not only the first; \"Sign out\" always stays on screen however long the name (a long name is shortened)."]},
   },
   {
     v: '0.9.261', date: '2026-11-18',
-    ar: {"news": ["(نسخة التطوير) السائق: قبل «بدء الدوام» يرى الرحلات وطلبيات الزبائن فقط، دون تحميل أو انطلاق أو تسليم، مع تنبيه وزر «بدء الدوام». والخادم يرفض الاستلام والتسليم قبل الدوام."]},
-    en: {"news": ["(Development copy) Drivers: before \"Start the shift\" they see trips and customer orders only, without loading, leaving or delivering, with a notice and a \"Start the shift\" button. The server refuses loading and delivering before the shift."]},
+    ar: {"news": ["السائق: قبل «بدء الدوام» يرى الرحلات وطلبيات الزبائن فقط، دون تحميل أو انطلاق أو تسليم، مع تنبيه وزر «بدء الدوام». والخادم يرفض الاستلام والتسليم قبل الدوام."]},
+    en: {"news": ["Drivers: before \"Start the shift\" they see trips and customer orders only, without loading, leaving or delivering, with a notice and a \"Start the shift\" button. The server refuses loading and delivering before the shift."]},
   },
   {
     v: '0.9.260', date: '2026-11-18',

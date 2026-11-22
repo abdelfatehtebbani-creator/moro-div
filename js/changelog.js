@@ -3,6 +3,11 @@
 //   todo: for everyone; admin: only for users who manage users (the admin).
 export const CHANGELOG = [
   {
+    v: '0.9.293', date: '2026-11-22',
+    ar: {"news": ["(نسخة التطوير) «الموظفون»: الحساب المربوط يظهر في عمود «حسابه في MORO» لكل الحسابات، ومنها حساب المطوّر."]},
+    en: {"news": ["(Development copy) Employees: the linked account shows in the MORO account column for every account, the developer's included."]}
+  },
+  {
     v: '0.9.292', date: '2026-11-22',
     ar: {"news": ["(نسخة التطوير) «الموظفون»: قائمة اختيار الحساب تشمل كل الحسابات النشطة، ومنها حساب الموارد البشرية نفسه، مع اسم المستخدم والقسم. والحسابات المربوطة من قبل تظهر في الآخر بعلامة «مربوط»."]},
     en: {"news": ["(Development copy) Employees: the account list has every active account, HR's own included, with the username and department; accounts already linked come last, marked linked."]}

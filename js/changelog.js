@@ -3,14 +3,19 @@
 //   todo: for everyone; admin: only for users who manage users (the admin).
 export const CHANGELOG = [
   {
+    v: '0.9.291', date: '2026-11-22',
+    ar: {"news": ["(نسخة التطوير) «الموارد البشرية ← ملفي»: يرى كل موظف بياناته هو فقط: الرمز والوظيفة والشركة وتاريخ الالتحاق وسنوات الخدمة، ووثائقه (البطاقة، الجواز، البطاقة الصحية) مع الأيام المتبقية لانتهاء كل منها بلون. يعمل حتى والشاشة «قيد البناء».", "(نسخة التطوير) تبويب «الموظفون» للموارد البشرية: رفع قائمة الموظفين (ملف Excel المصدَّر من MyFiles). العامل يُربط بحسابه تلقائيًا برقم بطاقته، والباقون يُربطون من الجدول. من لم يعد في الملف يُعلَّم غير نشط ولا يُحذف."]},
+    en: {"news": ["(Development copy) Human resources, My file: each employee sees their own data only: code, job, company, joining date and years of service, and their documents (ID card, passport, health card) with the days left on each, in colour. It works even while the screen is being built.", "(Development copy) An Employees tab for HR: upload the employees list (the Excel exported from MyFiles). A worker is linked to their account by their QID; the others are linked in the table. Who is no longer in the file is marked inactive, not deleted."]}
+  },
+  {
     v: '0.9.290', date: '2026-11-22',
-    ar: {"news": ["(نسخة التطوير) MORO صار يرمز إلى «Management of Operations, Resources & Orders»: إدارة العمليات والموارد والطلبيات، ليصف كل ما يضمه التطبيق اليوم. الاسم والأيقونة والرابط كما هي."]},
-    en: {"news": ["(Development copy) MORO now stands for Management of Operations, Resources & Orders, to describe all the app holds today. The name, icon and link stay the same."]}
+    ar: {"news": ["MORO صار يرمز إلى «Management of Operations, Resources & Orders»: إدارة العمليات والموارد والطلبيات، ليصف كل ما يضمه التطبيق اليوم. الاسم والأيقونة والرابط كما هي."]},
+    en: {"news": ["MORO now stands for Management of Operations, Resources & Orders, to describe all the app holds today. The name, icon and link stay the same."]}
   },
   {
     v: '0.9.289', date: '2026-11-22',
-    ar: {"news": ["(نسخة التطوير) شاشة «الموارد البشرية» تعمل دائمًا في نسخة التطوير للتجربة، وتبقى «قيد البناء» في الإنتاج حتى يشغّلها المدير."]},
-    en: {"news": ["(Development copy) The Human resources screen always works in the development copy, for testing; in production it stays \"being built\" until the admin switches it on."]}
+    ar: {"news": ["شاشة «الموارد البشرية» تعمل دائمًا في نسخة التطوير للتجربة، وتبقى «قيد البناء» في الإنتاج حتى يشغّلها المدير."]},
+    en: {"news": ["The Human resources screen always works in the development copy, for testing; in production it stays \"being built\" until the admin switches it on."]}
   },
   {
     v: '0.9.288', date: '2026-11-22',

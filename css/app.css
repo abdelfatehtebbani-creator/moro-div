@@ -1164,3 +1164,13 @@ tr.rc-off td .check, tr.rc-off td .btn, tr.rc-off td button { text-decoration: n
 .hr-group[open] > summary { margin-bottom: 8px; }
 .hr-preview { background: #fff7e0; color: #8a5a00; border: 1px dashed #e0b84c; border-radius: var(--radius); padding: 8px 12px; font-weight: 600; margin-bottom: 8px; }
 .toast.warn { background: #b7791f; }
+/* My file */
+.hf { display: grid; gap: 12px; }
+.hf-head { display: grid; gap: 6px; }
+.hf-name { font-size: 18px; }
+.hf-meta { display: flex; gap: 6px; flex-wrap: wrap; }
+.hf-facts { display: flex; gap: 24px; flex-wrap: wrap; }
+.hf-facts > div { display: grid; gap: 2px; }
+.pill.hf-bad { background: #fde8e8; color: var(--danger); }
+.pill.hf-warn { background: #fff4e0; color: #a15c00; }
+.pill.hf-ok { background: #e7f6ec; color: #1f7a3a; }

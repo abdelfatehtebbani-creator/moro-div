@@ -8,10 +8,12 @@ import { t, errText, getLang } from '../i18n.js';
 import { h, toast, flash, fmtDate, trackFilled } from '../ui.js';
 import { field, newId, combo } from '../components.js';
 import { shrink, photoButton } from '../photos.js';
+import { readXlsx } from '../xlsx-read.js';
 
 // until the admin switches HR on, the screen is shown and nothing is sent (every button says so)
 const live = () => (Data.boot || {}).hr_live === true || (Data.settings || {}).hr_live === '1';
-const READS = ['hr.mine', 'hr.list', 'pen.mine', 'pen.list', 'pen.people'];
+// reading, and HR's copy of the employees list (My file works before the requests are switched on)
+const READS = ['hr.mine', 'hr.list', 'pen.mine', 'pen.list', 'pen.people', 'hr.myFile', 'hr.empList', 'hr.empImport', 'hr.empLink'];
 function call(action, p) {
   if (live() || READS.includes(action)) return send(action, p);
   if (action === 'pen.seen' || action === 'hr.seenMine') return Promise.resolve({});
@@ -26,7 +28,7 @@ const DOC_TYPES = ['work_cert', 'salary_cert', 'experience_cert', 'to_whom', 're
 const PAPERS = ['work_cert', 'salary_cert', 'experience_cert', 'to_whom'];
 const ST_CLASS = { pending: 'soon', approved: 'in', ready: 'in', rejected: 'out', cancelled: 'low' };
 const PEN_CLASS = { proposed: 'soon', issued: 'out', objected: 'soon', kept: 'out', cancelled: 'low', dismissed: 'low' };
-let tab = 'new';
+let tab = 'myfile';
 let hrTab = 'pending';
 
 const typeName = (r) => (r.kind === 'advance' ? t('hr_advance') : t((r.kind === 'leave' ? 'hr_lt_' : 'hr_dt_') + r.type));
@@ -45,9 +47,9 @@ export function render(root) {
   const decide = Data.can('hr.decide');
   const head = !decide && Data.can('hr.seen') && ((Data.user || {}).depts || []).length > 0;
   const penAll = decide || Data.can('hr.penalty_propose') || head;
-  const tabs = [['new', 'hr_tab_new'], ['mine', 'hr_tab_mine'], ['penmine', 'pen_tab_mine']].concat(head ? [['dept', 'hr_tab_dept']] : []).concat(decide ? [['hr', 'hr_tab_hr']] : [])
-    .concat(penAll ? [['pen', 'pen_tab']] : []);
-  if (!tabs.some(([k]) => k === tab)) tab = 'new';
+  const tabs = [['myfile', 'hf_tab'], ['new', 'hr_tab_new'], ['mine', 'hr_tab_mine'], ['penmine', 'pen_tab_mine']].concat(head ? [['dept', 'hr_tab_dept']] : []).concat(decide ? [['hr', 'hr_tab_hr']] : [])
+    .concat(penAll ? [['pen', 'pen_tab']] : []).concat(decide ? [['emps', 'hf_tab_emps']] : []);
+  if (!tabs.some(([k]) => k === tab)) tab = 'myfile';
   const box = h('div');
   // the numbers on the tabs: what waits for this user there
   const cnt = (k) => { const c = (Data.boot || {}).hr_counts || {}; return Number({ mine: c.my_req_new, penmine: c.my_pen_new, hr: c.hr_pending, pen: c.pen_todo }[k]) || 0; };
@@ -57,7 +59,9 @@ export function render(root) {
 
   function draw() {
     bar.querySelectorAll('button').forEach((b, i) => b.classList.toggle('on', tabs[i][0] === tab));
-    if (tab === 'new') newForm();
+    if (tab === 'myfile') myFile();
+    else if (tab === 'emps') empsBoard();
+    else if (tab === 'new') newForm();
     else if (tab === 'mine') { listOf('hr.mine', {}, 'mine'); seen('mine', 'hr.seenMine'); }
     else if (tab === 'dept') listOf('hr.list', {}, 'dept');
     else if (tab === 'penmine') { penList('pen.mine', 'mine'); seen('penmine', 'pen.seen'); }
@@ -73,6 +77,98 @@ export function render(root) {
       const s = b && b.querySelector('.tab-badge'); if (s) s.remove();
       window.dispatchEvent(new Event('moro:hrseen'));
     }).catch(() => {});
+  }
+
+  // ---------- My file: the employee's own data (a copy of MyFiles' list), documents with the days left
+  async function myFile() {
+    box.replaceChildren(h('p.empty', '…'));
+    try {
+      const r = await call('hr.myFile', {});
+      const f = r.file;
+      if (!f) { box.replaceChildren(h('p.empty', t('hf_not_linked'))); return; }
+      const today = Data.todayIso();
+      const left = (d) => (d ? Math.round((Date.parse(d) - Date.parse(today)) / 864e5) : null);
+      const doc = (label, no, exp) => {
+        const n = left(exp);
+        const cls = n === null ? '' : n < 0 ? 'hf-bad' : n <= 30 ? 'hf-warn' : 'hf-ok';
+        return h('tr', h('td', h('b', t(label))), h('td.num', no ? h('bdi', no) : '—'), h('td.num', exp ? fmtDate(exp) : '—'),
+          h('td', n === null ? '' : h('span', { class: 'pill ' + cls }, n < 0 ? t('hf_expired', { n: -n }) : t('hf_days_left', { n }))));
+      };
+      const years = f.joining_date ? Math.floor((Date.parse(today) - Date.parse(f.joining_date)) / (365.25 * 864e5) * 10) / 10 : null;
+      box.replaceChildren(h('div.hf',
+        h('div.hf-head', h('div.hf-name', h('b', h('bdi', f.name)), h('small.muted', ' · ' + t('hf_code') + ' ' + f.code)),
+          h('div.hf-meta', [f.job, f.company, f.nationality].filter(Boolean).map((x) => h('span.pill', h('bdi', x))))),
+        h('div.hf-facts', h('div', h('small.muted', t('hf_joining')), h('b', h('bdi', { dir: 'ltr' }, f.joining_date ? fmtDate(f.joining_date) : '—')), years !== null ? h('small.muted', ' (' + t('hf_years', { n: years }) + ')') : ''),
+          f.rejoin_date ? h('div', h('small.muted', t('hf_rejoin')), h('b', h('bdi', { dir: 'ltr' }, fmtDate(f.rejoin_date)))) : ''),
+        h('div.table-wrap', h('table', h('thead', h('tr', h('th', t('hf_doc')), h('th', t('hf_no')), h('th', t('hf_expiry')), h('th', ''))),
+          h('tbody', doc('hf_qid', f.qid, f.qid_expiry), doc('hf_passport', f.passport_no, f.passport_expiry), doc('hf_health', f.health_no, f.health_expiry),
+            f.contract_expiry ? doc('hf_contract', '', f.contract_expiry) : ''))),
+        h('small.muted', t('hf_help', { t: r.updated_at ? fmtDate(String(r.updated_at).slice(0, 10)) : '—' }))));
+    } catch (e) { box.replaceChildren(h('p.empty', errText(e))); }
+  }
+
+  // ---------- HR: the employees list (MyFiles' Excel export) and the accounts linked to it
+  async function empsBoard() {
+    const status = h('p.form-status', '');
+    const toIso = (v) => {
+      if (typeof v === 'number' && v > 20000) return new Date(Math.round((v - 25569) * 864e5)).toISOString().slice(0, 10);
+      return String(v || '').trim();
+    };
+    const upload = h('button.btn', { type: 'button', onclick: () => {
+      const file = h('input', { type: 'file', accept: '.xlsx' });
+      file.addEventListener('change', async () => {
+        const fl = file.files[0]; if (!fl) return;
+        let rows;
+        try {
+          const all = await readXlsx(fl);
+          const head = (all[0] || []).map((x) => String(x || '').trim().toLowerCase());
+          const col = (...names) => head.findIndex((x) => names.includes(x));
+          const map = { code: col('code'), name: col('name'), qid: col('qid'), qid_expiry: col('qid expiry'), company: col('cr', 'company'), nationality: col('nationality'),
+            job: col('job title', 'job'), phone: col('phone'), passport_no: col('passport no'), passport_expiry: col('passport expiry'), health_no: col('health card no'),
+            health_expiry: col('health card expiry'), contract_expiry: col('contract expiry'), joining_date: col('joining date'), rejoin_date: col('rejoin date') };
+          if (map.code < 0 || map.name < 0 || map.qid < 0) { toast(t('hf_bad_file'), 'err'); return; }
+          rows = all.slice(1).filter((r) => String(r[map.code] || '').trim()).map((r) => {
+            const o = {}; Object.keys(map).forEach((k) => { o[k] = map[k] < 0 ? '' : (/expiry|date/.test(k) ? toIso(r[map[k]]) : String(r[map[k]] ?? '').trim()); }); return o;
+          });
+        } catch { toast(t('hf_bad_file'), 'err'); return; }
+        try {
+          const pv = await call('hr.empImport', { rows });
+          const ok = window.confirm(t('hf_import_q', { n: pv.rows, a: pv.new_rows, g: pv.gone, d: pv.dup_qid, q: pv.no_qid }));
+          if (!ok) return;
+          const r = await call('hr.empImport', { rows, apply: true });
+          toast(t('hf_import_done', { n: r.rows, l: r.linked }), 'ok'); empsBoard();
+        } catch (e) { toast(errText(e), 'err'); }
+      });
+      file.click();
+    } }, '⬆ ' + t('hf_import'));
+    box.replaceChildren(h('div.form-actions', upload), h('small.muted', t('hf_import_help')), status, h('p.empty', '…'));
+    try {
+      const [list, users] = await Promise.all([call('hr.empList', {}), call('pen.people', {}).catch(() => [])]);
+      const people = users.map((u) => ({ value: u.user_id, label: u.name, hint: u.dept }));
+      const q = trackFilled(h('input.input', { type: 'search', placeholder: t('hf_search_ph') }));
+      const onlyFree = h('input', { type: 'checkbox' });
+      const body = h('tbody');
+      const fill = () => {
+        const s = q.value.trim().toLowerCase();
+        const rows = list.filter((e) => (!s || (e.name + ' ' + e.code + ' ' + e.company + ' ' + (e.user_name || '')).toLowerCase().includes(s)) && (!onlyFree.checked || !e.user_id));
+        body.replaceChildren(...rows.slice(0, 300).map((e) => {
+          const pick = combo({ id: 'hf-u-' + e.code, placeholder: t('hf_pick_user'), options: () => people, onPick: async (v) => {
+            if (!v) return;
+            try { await call('hr.empLink', { code: e.code, user_id: v }); toast(t('saved'), 'ok'); empsBoard(); } catch (er) { toast(errText(er), 'err'); }
+          } });
+          return h('tr', h('td.num', e.code), h('td.wrap', h('bdi', e.name), e.dup_qid ? h('span.pill.out', ' ' + t('hf_dup_qid')) : ''), h('td', h('bdi', e.job)),
+            h('td.wrap', e.user_id ? h('span', h('b', h('bdi', e.user_name)), e.by_hand ? h('button.link', { type: 'button', onclick: async () => {
+              try { await call('hr.empLink', { code: e.code, user_id: '' }); empsBoard(); } catch (er) { toast(errText(er), 'err'); } } }, ' ✕') : h('small.muted', ' · ' + t('hf_by_qid'))) : pick.el));
+        }));
+      };
+      q.addEventListener('input', fill); onlyFree.addEventListener('change', fill);
+      const linked = list.filter((e) => e.user_id).length;
+      box.replaceChildren(h('div.form-actions', upload), h('small.muted', t('hf_import_help')), status,
+        h('p', t('hf_count', { n: list.length, l: linked })),
+        h('div.search', q, h('label.check', onlyFree, ' ', t('hf_only_free'))),
+        h('div.table-wrap.tall', h('table', h('thead', h('tr', h('th', t('hf_code')), h('th', t('hf_name')), h('th', t('hf_job')), h('th', t('hf_account')))), body)));
+      fill();
+    } catch (e) { box.replaceChildren(h('div.form-actions', upload), h('p.empty', errText(e))); }
   }
 
   // ---------- a new request

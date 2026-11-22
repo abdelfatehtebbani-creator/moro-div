@@ -13,7 +13,7 @@ import { readXlsx } from '../xlsx-read.js';
 // until the admin switches HR on, the screen is shown and nothing is sent (every button says so)
 const live = () => (Data.boot || {}).hr_live === true || (Data.settings || {}).hr_live === '1';
 // reading, and HR's copy of the employees list (My file works before the requests are switched on)
-const READS = ['hr.mine', 'hr.list', 'pen.mine', 'pen.list', 'pen.people', 'hr.myFile', 'hr.empList', 'hr.empImport', 'hr.empLink'];
+const READS = ['hr.mine', 'hr.list', 'pen.mine', 'pen.list', 'pen.people', 'hr.myFile', 'hr.empList', 'hr.empImport', 'hr.empLink', 'hr.empUsers'];
 function call(action, p) {
   if (live() || READS.includes(action)) return send(action, p);
   if (action === 'pen.seen' || action === 'hr.seenMine') return Promise.resolve({});
@@ -143,8 +143,11 @@ export function render(root) {
     } }, '⬆ ' + t('hf_import'));
     box.replaceChildren(h('div.form-actions', upload), h('small.muted', t('hf_import_help')), status, h('p.empty', '…'));
     try {
-      const [list, users] = await Promise.all([call('hr.empList', {}), call('pen.people', {}).catch(() => [])]);
-      const people = users.map((u) => ({ value: u.user_id, label: u.name, hint: u.dept }));
+      const [list, users] = await Promise.all([call('hr.empList', {}), call('hr.empUsers', {}).catch(() => [])]);
+      // every account (HR themselves included), the ones already linked last
+      const taken = new Set(list.map((e) => e.user_id).filter(Boolean));
+      const people = users.map((u) => ({ value: u.user_id, label: u.name, alt: u.username, hint: [u.username, u.dept, taken.has(u.user_id) ? t('hf_linked') : ''].filter(Boolean).join(' · ') }))
+        .sort((a, b) => (taken.has(a.value) - taken.has(b.value)) || a.label.localeCompare(b.label));
       const q = trackFilled(h('input.input', { type: 'search', placeholder: t('hf_search_ph') }));
       const onlyFree = h('input', { type: 'checkbox' });
       const body = h('tbody');

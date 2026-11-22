@@ -3,6 +3,11 @@
 //   todo: for everyone; admin: only for users who manage users (the admin).
 export const CHANGELOG = [
   {
+    v: '0.9.292', date: '2026-11-22',
+    ar: {"news": ["(نسخة التطوير) «الموظفون»: قائمة اختيار الحساب تشمل كل الحسابات النشطة، ومنها حساب الموارد البشرية نفسه، مع اسم المستخدم والقسم. والحسابات المربوطة من قبل تظهر في الآخر بعلامة «مربوط»."]},
+    en: {"news": ["(Development copy) Employees: the account list has every active account, HR's own included, with the username and department; accounts already linked come last, marked linked."]}
+  },
+  {
     v: '0.9.291', date: '2026-11-22',
     ar: {"news": ["(نسخة التطوير) «الموارد البشرية ← ملفي»: يرى كل موظف بياناته هو فقط: الرمز والوظيفة والشركة وتاريخ الالتحاق وسنوات الخدمة، ووثائقه (البطاقة، الجواز، البطاقة الصحية) مع الأيام المتبقية لانتهاء كل منها بلون. يعمل حتى والشاشة «قيد البناء».", "(نسخة التطوير) تبويب «الموظفون» للموارد البشرية: رفع قائمة الموظفين (ملف Excel المصدَّر من MyFiles). العامل يُربط بحسابه تلقائيًا برقم بطاقته، والباقون يُربطون من الجدول. من لم يعد في الملف يُعلَّم غير نشط ولا يُحذف."]},
     en: {"news": ["(Development copy) Human resources, My file: each employee sees their own data only: code, job, company, joining date and years of service, and their documents (ID card, passport, health card) with the days left on each, in colour. It works even while the screen is being built.", "(Development copy) An Employees tab for HR: upload the employees list (the Excel exported from MyFiles). A worker is linked to their account by their QID; the others are linked in the table. Who is no longer in the file is marked inactive, not deleted."]}

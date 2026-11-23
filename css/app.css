@@ -1175,3 +1175,4 @@ tr.rc-off td .check, tr.rc-off td .btn, tr.rc-off td button { text-decoration: n
 .pill.hf-warn { background: #fff4e0; color: #a15c00; }
 .pill.hf-ok { background: #e7f6ec; color: #1f7a3a; }
 .hr-me { border: 1px solid var(--line); border-radius: var(--radius); padding: 10px 12px; background: #fbfaff; display: grid; gap: 10px; }
+.myfiles-btn { font-weight: 700; color: #7c3aed !important; }

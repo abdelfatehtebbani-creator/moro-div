@@ -3,6 +3,11 @@
 //   todo: for everyone; admin: only for users who manage users (the admin).
 export const CHANGELOG = [
   {
+    v: '0.9.296', date: '2026-11-23',
+    ar: {"news": ["(نسخة التطوير) زر «↗ فتح MyFiles» في القائمة وفي «المزيد» للمدير والموارد البشرية، يفتح تطبيق MyFiles في نافذة جديدة. عنوانه يُكتب في «المستخدمون ← الإعدادات العامة ← رابط MyFiles»."]},
+    en: {"news": ["(Development copy) An Open MyFiles button in the menu and in More, for the admin and HR, opens the MyFiles app in a new window. Its address is set in Users, General settings, MyFiles link."]}
+  },
+  {
     v: '0.9.295', date: '2026-11-23',
     ar: {"news": ["(نسخة التطوير) «الموارد البشرية»: تبويبات الموظف (ملفي، طلب جديد، طلباتي، مخالفاتي) صارت تحت تبويب واحد «خدماتي» في إطار خاص، وبجانبه تبويبات العمل: «الطلبات» و«المخالفات» و«الموظفون». و«الموظفون» صار له صلاحية مستقلة في شجرة الصلاحيات «قائمة الموظفين وربطها بالحسابات»، ويحتفظ بها من كان يرد على الطلبات."]},
     en: {"news": ["(Development copy) Human resources: the employee's tabs (My file, New request, My requests, My penalties) are under one tab, My services, in their own frame, next to the work tabs Requests, Penalties and Employees. Employees has its own tick now (The employees list and its links to the accounts); whoever answered the requests keeps it."]}

@@ -262,9 +262,16 @@ function buildShell() {
   updateBadges();
 }
 
+/** MyFiles (the admin staff's app), for the admin and HR, when its address is set (Users, General settings). */
+function myFilesButton(tag) {
+  const url = (Data.settings || {}).myfiles_url;
+  if (!url || !(Data.user.role === 'admin' || Data.can('hr.decide') || Data.can('hr.empList'))) return null;
+  return h(tag, { type: 'button', class: 'myfiles-btn', onclick: () => window.open(url, '_blank', 'noopener') }, '↗ ' + t('open_myfiles'));
+}
+
 /** The user's own buttons: in the side menu, and on the home screen (where the side menu is hidden). */
 function accountButtons() {
-  return [
+  return [myFilesButton('button'),
     h('button', { type: 'button', onclick: () => whatsNew(true) }, t('whats_new')),
     pushButton('button'),
     h('button', { type: 'button', onclick: changePin }, t('change_pin')),
@@ -368,6 +375,7 @@ function showMore() {
     h('div', h('b', u.display_name), ' · ', h('span.muted', t('role_' + u.role) + ' · v' + APP_VERSION)),
     h('nav.nav', { style: 'display:grid;gap:4px' }, Object.keys(ROUTES).filter(allowed).map((name) =>
       h('a', { href: '#/' + name, style: 'color:var(--ink)' }, icon(name), h('span', t(name))))),
+    myFilesButton('button.btn.secondary'),
     h('button.btn.secondary', { type: 'button', onclick: () => whatsNew(true) }, t('whats_new')),
     pushButton('button.btn.secondary'),
     h('button.btn.secondary', { type: 'button', onclick: changePin }, t('change_pin')),

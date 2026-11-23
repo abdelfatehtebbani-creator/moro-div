@@ -50,6 +50,7 @@ export async function render(root) {
       Data.can('settings.recipeStock') ? recipeStockBox() : null,
       Data.can('settings.issueDirect') ? issueDirectBox() : null,
       Data.can('settings.hrLive') ? hrLiveBox() : null,
+      Data.can('settings.myfilesUrl') ? myFilesBox() : null,
       Data.can('kiosk.off') ? kioskBox() : null,
       Data.can('vehicles.save') ? vehiclesBox() : null,
       Data.can('workers.import') ? workersBox() : null,
@@ -175,6 +176,17 @@ export async function render(root) {
       h('b', t('kiosk_depts')), h('div.check-grid', depts.map((x) => h('label.check', x.box, ' ', h('bdi', x.d.name)))),
       h('b', t('kiosk_tiles')), h('div.check-grid', tiles.map((x) => h('label.check', x.box, ' ', t('kiosk_tile_' + x.k)))),
       h('div.form-actions', h('button.btn', { type: 'button', onclick: save }, t('save'))));
+  }
+
+  // the address of MyFiles: a button in the menu opens it (the admin and HR)
+  function myFilesBox() {
+    const url = trackFilled(h('input.input#set-myfiles', { type: 'url', placeholder: 'https://…', value: (Data.settings || {}).myfiles_url || '' }));
+    const save = async () => {
+      try { await call('settings.myfilesUrl', { url: url.value.trim() }); toast(t('saved'), 'ok'); Data.refresh().catch(() => {}); }
+      catch (e) { toast(errText(e), 'err'); }
+    };
+    return h('details.kiosk-box', h('summary', h('b', t('myfiles_title'))), h('small.muted', t('myfiles_help')),
+      h('div.form-grid', field(t('myfiles_url'), url, { wide: true }), h('div.field', h('label', '\u00a0'), h('button.btn', { type: 'button', onclick: save }, t('save')))));
   }
 
   // the HR screen: shown to everyone as "being built" until switched on (then requests and penalties are sent)

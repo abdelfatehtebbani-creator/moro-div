@@ -3,6 +3,11 @@
 //   todo: for everyone; admin: only for users who manage users (the admin).
 export const CHANGELOG = [
   {
+    v: '0.9.295', date: '2026-11-23',
+    ar: {"news": ["(نسخة التطوير) «الموارد البشرية»: تبويبات الموظف (ملفي، طلب جديد، طلباتي، مخالفاتي) صارت تحت تبويب واحد «خدماتي» في إطار خاص، وبجانبه تبويبات العمل: «الطلبات» و«المخالفات» و«الموظفون». و«الموظفون» صار له صلاحية مستقلة في شجرة الصلاحيات «قائمة الموظفين وربطها بالحسابات»، ويحتفظ بها من كان يرد على الطلبات."]},
+    en: {"news": ["(Development copy) Human resources: the employee's tabs (My file, New request, My requests, My penalties) are under one tab, My services, in their own frame, next to the work tabs Requests, Penalties and Employees. Employees has its own tick now (The employees list and its links to the accounts); whoever answered the requests keeps it."]}
+  },
+  {
     v: '0.9.294', date: '2026-11-23',
     ar: {"news": ["(نسخة التطوير) دور جديد «الموارد البشرية»: يرد على طلبات الموظفين (الإجازة، الوثائق، السلفة)، ويسجّل المخالفات ويصدرها ويفصل في الاعتراضات، ويرفع قائمة الموظفين ويربطها بالحسابات. لا يرى المخزون ولا المستخدمين."]},
     en: {"news": ["(Development copy) A new role, Human resources: answers the employees' requests (leave, documents, advances), records and issues penalties and rules on objections, uploads the employees list and links it to the accounts. No stock, no users."]}

@@ -28,7 +28,8 @@ const DOC_TYPES = ['work_cert', 'salary_cert', 'experience_cert', 'to_whom', 're
 const PAPERS = ['work_cert', 'salary_cert', 'experience_cert', 'to_whom'];
 const ST_CLASS = { pending: 'soon', approved: 'in', ready: 'in', rejected: 'out', cancelled: 'low' };
 const PEN_CLASS = { proposed: 'soon', issued: 'out', objected: 'soon', kept: 'out', cancelled: 'low', dismissed: 'low' };
-let tab = 'myfile';
+let tab = 'me';
+let meTab = 'myfile';          // inside "My services": my file, a new request, my requests, my penalties
 let hrTab = 'pending';
 
 const typeName = (r) => (r.kind === 'advance' ? t('hr_advance') : t((r.kind === 'leave' ? 'hr_lt_' : 'hr_dt_') + r.type));
@@ -41,31 +42,40 @@ const catName = (c) => { const p = String(c || '').split('|').map((x) => x.trim(
 const closed = (r) => ['kept', 'cancelled', 'dismissed'].includes(r.status) || (r.status === 'issued' && !r.can_object);
 
 /** Opens the screen on a tab (the banners: a new penalty → My penalties, a request accepted → My requests). */
-export function openTab(name) { tab = name; if (location.hash === '#/hr') window.dispatchEvent(new HashChangeEvent('hashchange')); else location.hash = '#/hr'; }
+export function openTab(name) { if (['myfile', 'new', 'mine', 'penmine'].includes(name)) { tab = 'me'; meTab = name; } else tab = name; if (location.hash === '#/hr') window.dispatchEvent(new HashChangeEvent('hashchange')); else location.hash = '#/hr'; }
 
 export function render(root) {
   const decide = Data.can('hr.decide');
   const head = !decide && Data.can('hr.seen') && ((Data.user || {}).depts || []).length > 0;
   const penAll = decide || Data.can('hr.penalty_propose') || head;
-  const tabs = [['myfile', 'hf_tab'], ['new', 'hr_tab_new'], ['mine', 'hr_tab_mine'], ['penmine', 'pen_tab_mine']].concat(head ? [['dept', 'hr_tab_dept']] : []).concat(decide ? [['hr', 'hr_tab_hr']] : [])
-    .concat(penAll ? [['pen', 'pen_tab']] : []).concat(decide ? [['emps', 'hf_tab_emps']] : []);
-  if (!tabs.some(([k]) => k === tab)) tab = 'myfile';
+  // "My services" (everyone's own: file, requests, penalties) first, then the work on the others' requests
+  const meTabs = [['myfile', 'hf_tab'], ['new', 'hr_tab_new'], ['mine', 'hr_tab_mine'], ['penmine', 'pen_tab_mine']];
+  const tabs = [['me', 'hr_tab_me']].concat(head ? [['dept', 'hr_tab_dept']] : []).concat(decide ? [['hr', 'hr_tab_hr']] : [])
+    .concat(penAll ? [['pen', 'pen_tab']] : []).concat(Data.can('hr.empList') ? [['emps', 'hf_tab_emps']] : []);
+  if (!tabs.some(([k]) => k === tab)) tab = 'me';
   const box = h('div');
   // the numbers on the tabs: what waits for this user there
-  const cnt = (k) => { const c = (Data.boot || {}).hr_counts || {}; return Number({ mine: c.my_req_new, penmine: c.my_pen_new, hr: c.hr_pending, pen: c.pen_todo }[k]) || 0; };
-  const bar = h('div.tabs.hr-tabs', tabs.map(([k, label]) => h('button', { type: 'button', class: tab === k ? 'on' : '', onclick: () => { tab = k; draw(); } }, t(label),
-    cnt(k) ? h('span.tab-badge', String(cnt(k))) : '')));
-  root.replaceChildren(h('div.card', h('div.card-head', h('h2', t('hr')), bar), live() ? '' : h('div.hr-preview', '🚧 ' + t('hr_preview_note')), box));
+  const cnt = (k) => { const c = (Data.boot || {}).hr_counts || {}; return Number({ me: (c.my_req_new || 0) + (c.my_pen_new || 0), mine: c.my_req_new, penmine: c.my_pen_new, hr: c.hr_pending, pen: c.pen_todo }[k]) || 0; };
+  const badge = (k) => (cnt(k) ? h('span.tab-badge', String(cnt(k))) : '');
+  const bar = h('div.tabs.hr-tabs', tabs.map(([k, label]) => h('button', { type: 'button', 'data-k': k, class: tab === k ? 'on' : '', onclick: () => { tab = k; draw(); } }, t(label), badge(k))));
+  const subbar = h('div.tabs.hr-sub.hr-me-tabs', meTabs.map(([k, label]) => h('button', { type: 'button', 'data-k': k, class: meTab === k ? 'on' : '', onclick: () => { meTab = k; draw(); } }, t(label), badge(k))));
+  const meFrame = h('div.hr-me', subbar);
+  const holder = h('div');
+  root.replaceChildren(h('div.card', h('div.card-head', h('h2', t('hr')), bar), live() ? '' : h('div.hr-preview', '🚧 ' + t('hr_preview_note')), holder));
 
   function draw() {
-    bar.querySelectorAll('button').forEach((b, i) => b.classList.toggle('on', tabs[i][0] === tab));
-    if (tab === 'myfile') myFile();
-    else if (tab === 'emps') empsBoard();
-    else if (tab === 'new') newForm();
-    else if (tab === 'mine') { listOf('hr.mine', {}, 'mine'); seen('mine', 'hr.seenMine'); }
-    else if (tab === 'dept') listOf('hr.list', {}, 'dept');
-    else if (tab === 'penmine') { penList('pen.mine', 'mine'); seen('penmine', 'pen.seen'); }
-    else if (tab === 'pen') penBoard();
+    bar.querySelectorAll('button').forEach((b) => b.classList.toggle('on', b.dataset.k === tab));
+    subbar.querySelectorAll('button').forEach((b) => b.classList.toggle('on', b.dataset.k === meTab));
+    // My services: its own tabs in a frame, the content under them
+    if (tab === 'me') { meFrame.replaceChildren(subbar, box); holder.replaceChildren(meFrame); } else holder.replaceChildren(box);
+    const k = tab === 'me' ? meTab : tab;
+    if (k === 'myfile') myFile();
+    else if (k === 'emps') empsBoard();
+    else if (k === 'new') newForm();
+    else if (k === 'mine') { listOf('hr.mine', {}, 'mine'); seen('mine', 'hr.seenMine'); }
+    else if (k === 'dept') listOf('hr.list', {}, 'dept');
+    else if (k === 'penmine') { penList('pen.mine', 'mine'); seen('penmine', 'pen.seen'); }
+    else if (k === 'pen') penBoard();
     else hrList();
   }
 
@@ -73,8 +83,8 @@ export function render(root) {
   function seen(k, action) {
     if (!cnt(k)) return;
     call(action, {}).then(() => Data.refresh()).then(() => {
-      const b = bar.querySelectorAll('button')[tabs.findIndex((x) => x[0] === k)];
-      const s = b && b.querySelector('.tab-badge'); if (s) s.remove();
+      [subbar.querySelector('[data-k="' + k + '"] .tab-badge'), bar.querySelector('[data-k="me"] .tab-badge')].forEach((x) => { if (x) x.remove(); });
+      const b2 = bar.querySelector('[data-k="me"]'); if (b2 && cnt('me') - cnt(k) > 0) b2.append(h('span.tab-badge', String(cnt('me') - cnt(k))));
       window.dispatchEvent(new Event('moro:hrseen'));
     }).catch(() => {});
   }
@@ -215,7 +225,7 @@ export function render(root) {
       try {
         await call('hr.create', { kind, type: type.value, date_from: from.value, date_to: to.value, addressed_to: to2.value, amount: amount.value, reason: reason.value, client_id: newId() });
         toast(t('hr_sent'), 'ok');
-        tab = 'mine'; draw();
+        tab = 'me'; meTab = 'mine'; draw();
       } catch (e) { status.textContent = errText(e); status.className = 'form-status err'; send.disabled = false; }
     } }, t('hr_send'));
     const dept = ((Data.user || {}).depts || [])[0];

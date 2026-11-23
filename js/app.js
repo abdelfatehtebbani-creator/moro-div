@@ -38,6 +38,7 @@ import * as online from './views/online.js';
 import { Gps } from './gps.js';
 import * as fleet from './views/fleet.js';
 import * as hrView from './views/hr.js';
+import * as maint from './views/maint.js';
 
 const ROUTES = {
   home:      { view: home, perm: 'data.bootstrap', group: 'nav_main' },
@@ -51,6 +52,8 @@ const ROUTES = {
   trips:     { view: trips, perm: 'nav.trips', group: 'nav_ops' },
   // the vehicles: the car park manager, and the driver's records on their vehicle
   fleet:     { view: fleet, perm: 'nav.fleet', group: 'nav_ops' },
+  // maintenance: a fault reported by a shop, a department or a store, fixed by the maintenance team
+  maint:     { view: maint, perm: 'nav.maint', group: 'nav_ops' },
   invoices:  { view: invoices, perm: 'nav.invoices', group: 'nav_ops' },
   returns:   { view: returns, perm: 'nav.returns', group: 'nav_ops' },
   accounts:  { view: accounts, perm: 'nav.accounts', group: 'nav_ops' },
@@ -220,7 +223,7 @@ function buildShell() {
       } }, h('span', t(group)), h('span.nav-arrow', '▾')), items);
       navLinks.push(sec);
     }
-    (items || { append: (x) => navLinks.push(x) }).append(h('a', { href: '#/' + name, 'data-route': name }, icon(name), h('span', t(name)), ['lpo', 'requests', 'orderapprove', 'shoporders', 'production', 'orders', 'trips', 'invoices', 'returns', 'custorders', 'fleet', 'hr'].includes(name) ? h('span.badge', { hidden: true }) : null));
+    (items || { append: (x) => navLinks.push(x) }).append(h('a', { href: '#/' + name, 'data-route': name }, icon(name), h('span', t(name)), ['lpo', 'requests', 'orderapprove', 'shoporders', 'production', 'orders', 'trips', 'invoices', 'returns', 'custorders', 'fleet', 'hr', 'maint'].includes(name) ? h('span.badge', { hidden: true }) : null));
   }
   const side = h('aside.side',
     h('div.brand', h('img', { src: 'icons/logo.png', alt: '' }), h('div', h('b', t('app_name')), h('small', h('bdi', t('app_sub'))))),
@@ -232,7 +235,7 @@ function buildShell() {
   // phone: the first four allowed screens + "more" (opens the full menu)
   const phoneRoutes = Object.keys(ROUTES).filter(allowed).slice(0, 4);
   const bottom = h('nav.bottom-nav',
-    phoneRoutes.map((name) => h('a', { href: '#/' + name, 'data-route': name }, icon(name), h('span', t(name)), ['lpo', 'requests', 'orderapprove', 'shoporders', 'production', 'orders', 'trips', 'invoices', 'returns', 'custorders', 'fleet', 'hr'].includes(name) ? h('span.badge', { hidden: true }) : null)),
+    phoneRoutes.map((name) => h('a', { href: '#/' + name, 'data-route': name }, icon(name), h('span', t(name)), ['lpo', 'requests', 'orderapprove', 'shoporders', 'production', 'orders', 'trips', 'invoices', 'returns', 'custorders', 'fleet', 'hr', 'maint'].includes(name) ? h('span.badge', { hidden: true }) : null)),
     h('a', { href: '#/more', 'data-route': 'more' }, icon('more'), h('span', t('more'))));
 
   title = h('h1', '');
@@ -465,12 +468,15 @@ function updateBadges() {
   // HR: requests to answer; a head: their department's requests not seen yet
   const hrn = allowed('hr') ? Number(bb.hr_todo) || 0 : 0;
   document.querySelectorAll('a[data-route="hr"] .badge').forEach((b) => { b.hidden = !hrn; b.textContent = String(hrn); });
-  Push.badge(n + r + o + bl + sp + pr + more + ol + fo + hrn);
+  // maintenance: new reports; the accountant: money to answer; the reporter: fixes to confirm
+  const mtn = allowed('maint') ? Number(bb.maint_todo) || 0 : 0;
+  document.querySelectorAll('a[data-route="maint"] .badge').forEach((b) => { b.hidden = !mtn; b.textContent = String(mtn); });
+  Push.badge(n + r + o + bl + sp + pr + more + ol + fo + hrn + mtn);
   hrBanner();
   // the same numbers for "waiting for you" on the admin's home screen
   const ot2 = (Data.boot || {}).order_todo || {};
   Counts.now = { lpo: n, requests: r, orderapprove: o, shoporders: sp, production: pr, orders: allowed('orders') ? Number(ot2.orders) || 0 : 0,
-    trips: allowed('trips') ? Number(ot2.trips) || 0 : 0, invoices: allowed('invoices') ? Number(ot2.invoices) || 0 : 0, returns: allowed('returns') ? Number(ot2.returns) || 0 : 0, custorders: ol, fleet: fo, hr: hrn };
+    trips: allowed('trips') ? Number(ot2.trips) || 0 : 0, invoices: allowed('invoices') ? Number(ot2.invoices) || 0 : 0, returns: allowed('returns') ? Number(ot2.returns) || 0 : 0, custorders: ol, fleet: fo, hr: hrn, maint: mtn };
   window.dispatchEvent(new Event('moro:badges'));
 }
 

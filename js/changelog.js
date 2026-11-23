@@ -2,6 +2,15 @@
 // ("What's new"), with what they need to do. Newest first. Add an entry with every release.
 //   todo: for everyone; admin: only for users who manage users (the admin).
 export const CHANGELOG = [
+  { v: '0.9.297', date: '2026-11-23', ar: { news: [
+    '(نسخة التطوير) شاشة «الصيانة» الجديدة: الكاشير ومدير المحل ومدير الإنتاج ومسؤول القسم وأمين المخزن يبلّغون عن عطل في مكانهم، مع العتاد ونوع العطل والوصف وصورتين.',
+    '(نسخة التطوير) الصيانة تستلم البلاغ بدرجة استعجاله، وترد بحل مقترح أو بموعد تدخل، ثم تسجّل النتيجة: كليًا أو جزئيًا أو لم يُصلح. والمُبلِّغ يؤكد الإصلاح أو يقول «ما زال العطل».',
+    '(نسخة التطوير) الصيانة تطلب المال من المحاسب، فيوافق ويصرف أو يرفض، وتسجّل كل نفقة بصورة فاتورتها. وتقارير للإدارة: الأماكن والعتاد والأعطال الأكثر تكرارًا، والعتاد الأكثر كلفة، وأزمنة الاستجابة، والمتأخر.',
+  ] }, en: { news: [
+    '(Development copy) New Maintenance screen: the cashier, shop manager, production manager, department head and storekeeper report a fault in their place, with the equipment, the kind of fault, a description and two photos.',
+    '(Development copy) Maintenance receives the report with its urgency, answers with a fix to try or a visit date, then records the result: fully, partly or not fixed. The reporter confirms the fix or says it is still broken.',
+    '(Development copy) Maintenance asks the accountant for money (approved and paid, or refused) and records every expense with its invoice photo. Figures for the management: most frequent places, equipment and faults, most costly equipment, response times and late reports.',
+  ] } },
   {
     v: '0.9.296', date: '2026-11-23',
     ar: {"news": ["(نسخة التطوير) زر «↗ فتح MyFiles» في القائمة وفي «المزيد» للمدير والموارد البشرية، يفتح تطبيق MyFiles في نافذة جديدة. عنوانه يُكتب في «المستخدمون ← الإعدادات العامة ← رابط MyFiles»."]},

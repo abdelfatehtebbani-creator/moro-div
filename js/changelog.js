@@ -2,6 +2,11 @@
 // ("What's new"), with what they need to do. Newest first. Add an entry with every release.
 //   todo: for everyone; admin: only for users who manage users (the admin).
 export const CHANGELOG = [
+  { v: '0.9.298', date: '2026-11-24', ar: { news: [
+    '(نسخة التطوير) في شاشة المستخدمين حقل جديد «بريد حساب MyFiles». عند فتح MORO من زر MyFiles يدخل صاحب البريد إلى حسابه في MORO مباشرة، دون اسم مستخدم أو رمز.',
+  ] }, en: { news: [
+    '(Development copy) The users screen has a new field, MyFiles account email. When MORO is opened from the MyFiles button, the owner of that email goes straight into their MORO account, without a username or PIN.',
+  ] } },
   { v: '0.9.297', date: '2026-11-23', ar: { news: [
     '(نسخة التطوير) شاشة «الصيانة» الجديدة: الكاشير ومدير المحل ومدير الإنتاج ومسؤول القسم وأمين المخزن يبلّغون عن عطل في مكانهم، مع العتاد ونوع العطل والوصف وصورتين.',
     '(نسخة التطوير) الصيانة تستلم البلاغ بدرجة استعجاله، وترد بحل مقترح أو بموعد تدخل، ثم تسجّل النتيجة: كليًا أو جزئيًا أو لم يُصلح. والمُبلِّغ يؤكد الإصلاح أو يقول «ما زال العطل».',

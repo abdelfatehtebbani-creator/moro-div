@@ -331,6 +331,9 @@ export async function render(root) {
       // a driver's vehicle: offered when they leave on a trip (they can change it there)
       const vehicle = trackFilled(h('input.input#u-vehicle', { type: 'text', maxlength: 30, value: u ? u.vehicle || '' : '' }));
       const vehicleField = field(t('vehicle_no'), vehicle);
+      // the user's MyFiles account: MORO opens from MyFiles straight into this account
+      const mfMail = trackFilled(h('input.input#u-myfiles', { type: 'email', dir: 'ltr', maxlength: 120, placeholder: 'name@example.com', value: u ? u.myfiles_email || '' : '' }));
+      const mfField = h('div', field(t('myfiles_email'), mfMail), h('small.muted', t('myfiles_email_help')));
       const dev = h('input', { type: 'checkbox', checked: !!(u && u.developer) });
       const devField = h('div', h('label.check', dev, ' ', t('developer_account')), h('small.muted', t('developer_help')));
       const showRoleFields = () => { shopField.hidden = role.value !== 'cashier'; deptField.hidden = role.value !== 'section_head' && role.value !== 'branch_manager'; branchField.hidden = role.value !== 'branch_manager'; devField.hidden = role.value !== 'admin'; vehicleField.hidden = role.value !== 'driver'; };
@@ -414,7 +417,7 @@ export async function render(root) {
         if (!u && !user.value.trim()) return flash(user);
         if (!u && !pin.value) return flash(pin);
         const p = { display_name: name.value, role: role.value, caps: [...chosen], stores: STORES.filter((s) => stores.has(s)), store_ops: storeOps(),
-          shop: role.value === 'cashier' ? shopSel.value : '', depts: role.value === 'section_head' || role.value === 'branch_manager' ? [...depts] : [], branches: role.value === 'branch_manager' ? [...branches] : [], developer: dev.checked, vehicle: role.value === 'driver' ? vehicle.value.trim() : '' };
+          shop: role.value === 'cashier' ? shopSel.value : '', depts: role.value === 'section_head' || role.value === 'branch_manager' ? [...depts] : [], branches: role.value === 'branch_manager' ? [...branches] : [], developer: dev.checked, vehicle: role.value === 'driver' ? vehicle.value.trim() : '', myfiles_email: mfMail.value.trim() };
         if (u) { p.user_id = u.user_id; p.active = active.checked; } else p.username = user.value;
         if (pin.value) p.pin = pin.value;
         try {
@@ -425,7 +428,7 @@ export async function render(root) {
         } catch (e) { err.textContent = errText(e); }
       };
       return [h('h3', u ? t('edit_user') : t('new_user')), field(t('display_name'), name), field(t('username'), user), field(t('role'), role),
-        field(u ? t('reset_pin') : t('pin'), pin), u ? h('label.check', active, ' ', t('active')) : null, shopField, vehicleField, deptField, branchField, devField,
+        field(u ? t('reset_pin') : t('pin'), pin), u ? h('label.check', active, ' ', t('active')) : null, shopField, vehicleField, deptField, branchField, devField, mfField,
         h('div.card-head', h('b', t('permissions')), reset), capBox,
         h('div.card-head', h('b', t('stores'))), h('small.muted', t('stores_help')), storeBox, opsHead, opsBox, err,
         h('div.actions', h('button.btn.secondary', { type: 'button', onclick: () => close() }, t('cancel')), h('button.btn', { type: 'button', onclick: ok }, t('save')))];

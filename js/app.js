@@ -107,8 +107,25 @@ window.addEventListener('moro:signed-out', async () => {
 });
 
 const step = (s) => { window.__moroStep = s + ' ' + APP_VERSION; };
+/** Opened from MyFiles (#sso=<ticket>): the linked account is signed in; another account on this device is signed out first. */
+async function fromMyFiles() {
+  const m = /[#&]sso=([A-Za-z0-9_-]{20,200})/.exec(location.hash);
+  if (!m) return;
+  history.replaceState(null, '', location.pathname + location.search);       // the ticket leaves the address at once
+  try {
+    const r = await call('auth.sso', { ticket: m[1] });
+    const was = String(session.token || '').split('.')[0];
+    if (was && was !== r.user.user_id) { try { await Push.signOut(); } catch { /* ignore */ } await kv.clear(); }
+    session.token = r.token;
+  } catch (e) {
+    // no linked account (or the ticket is old): the usual sign-in, with the reason
+    setTimeout(() => toast(errText(e), 'err'), 800);
+  }
+}
+
 async function start() {
   step('start');
+  await fromMyFiles();
   if (!session.token) {
     step('ping');
     let setupNeeded = false, noPin = false;

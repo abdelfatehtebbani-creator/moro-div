@@ -282,10 +282,11 @@ function buildShell() {
   updateBadges();
 }
 
-/** MyFiles (the admin staff's app), for the admin and HR, when its address is set (Users, General settings). */
+/** MyFiles (the admin staff's app), for whoever has a MyFiles account, when its address is set (Users, General settings). */
 function myFilesButton(tag) {
   const url = (Data.settings || {}).myfiles_url;
-  if (!url || !(Data.user.role === 'admin' || Data.can('hr.decide') || Data.can('hr.empList'))) return null;
+  // whoever has a MyFiles account (its email on their MORO account), as MyFiles shows MORO to whoever has a MORO account
+  if (!url || !String(Data.user.myfiles_email || '').trim()) return null;
   return h(tag, { type: 'button', class: 'myfiles-btn', onclick: () => window.open(url, '_blank', 'noopener') }, '↗ ' + t('open_myfiles'));
 }
 

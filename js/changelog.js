@@ -2,6 +2,11 @@
 // ("What's new"), with what they need to do. Newest first. Add an entry with every release.
 //   todo: for everyone; admin: only for users who manage users (the admin).
 export const CHANGELOG = [
+  { v: '0.9.299', date: '2026-11-24', ar: { news: [
+    '(نسخة التطوير) زر «↗ فتح MyFiles» يظهر الآن لكل من في حسابه بريد MyFiles، لا للمدير وHR وحدهما. وزر MORO في MyFiles يظهر كذلك لمن له حساب في MORO فقط.',
+  ] }, en: { news: [
+    '(Development copy) The Open MyFiles button now shows for everyone with a MyFiles email on their account, not only the admin and HR. Likewise, the MORO button in MyFiles shows only for people with a MORO account.',
+  ] } },
   { v: '0.9.298', date: '2026-11-24', ar: { news: [
     '(نسخة التطوير) في شاشة المستخدمين حقل جديد «بريد حساب MyFiles». عند فتح MORO من زر MyFiles يدخل صاحب البريد إلى حسابه في MORO مباشرة، دون اسم مستخدم أو رمز.',
   ] }, en: { news: [

@@ -8,12 +8,11 @@ import { t, errText, getLang } from '../i18n.js';
 import { h, toast, flash, fmtDate, trackFilled } from '../ui.js';
 import { field, newId, combo } from '../components.js';
 import { shrink, photoButton } from '../photos.js';
-import { readXlsx } from '../xlsx-read.js';
 
 // until the admin switches HR on, the screen is shown and nothing is sent (every button says so)
 const live = () => (Data.boot || {}).hr_live === true || (Data.settings || {}).hr_live === '1';
 // reading, and HR's copy of the employees list (My file works before the requests are switched on)
-const READS = ['hr.mine', 'hr.list', 'pen.mine', 'pen.list', 'pen.people', 'hr.myFile', 'hr.empList', 'hr.empImport', 'hr.empLink', 'hr.empUsers'];
+const READS = ['hr.mine', 'hr.list', 'pen.mine', 'pen.list', 'pen.people', 'hr.myFile', 'hr.empList', 'hr.empLink', 'hr.empUsers'];
 function call(action, p) {
   if (live() || READS.includes(action)) return send(action, p);
   if (action === 'pen.seen' || action === 'hr.seenMine') return Promise.resolve({});
@@ -117,41 +116,10 @@ export function render(root) {
     } catch (e) { box.replaceChildren(h('p.empty', errText(e))); }
   }
 
-  // ---------- HR: the employees list (MyFiles' Excel export) and the accounts linked to it
+  // ---------- HR: the employees list (read from MyFiles) and the accounts linked to it
   async function empsBoard() {
     const status = h('p.form-status', '');
-    const toIso = (v) => {
-      if (typeof v === 'number' && v > 20000) return new Date(Math.round((v - 25569) * 864e5)).toISOString().slice(0, 10);
-      return String(v || '').trim();
-    };
-    const upload = h('button.btn', { type: 'button', onclick: () => {
-      const file = h('input', { type: 'file', accept: '.xlsx' });
-      file.addEventListener('change', async () => {
-        const fl = file.files[0]; if (!fl) return;
-        let rows;
-        try {
-          const all = await readXlsx(fl);
-          const head = (all[0] || []).map((x) => String(x || '').trim().toLowerCase());
-          const col = (...names) => head.findIndex((x) => names.includes(x));
-          const map = { code: col('code'), name: col('name'), qid: col('qid'), qid_expiry: col('qid expiry'), company: col('cr', 'company'), nationality: col('nationality'),
-            job: col('job title', 'job'), phone: col('phone'), passport_no: col('passport no'), passport_expiry: col('passport expiry'), health_no: col('health card no'),
-            health_expiry: col('health card expiry'), contract_expiry: col('contract expiry'), joining_date: col('joining date'), rejoin_date: col('rejoin date') };
-          if (map.code < 0 || map.name < 0 || map.qid < 0) { toast(t('hf_bad_file'), 'err'); return; }
-          rows = all.slice(1).filter((r) => String(r[map.code] || '').trim()).map((r) => {
-            const o = {}; Object.keys(map).forEach((k) => { o[k] = map[k] < 0 ? '' : (/expiry|date/.test(k) ? toIso(r[map[k]]) : String(r[map[k]] ?? '').trim()); }); return o;
-          });
-        } catch { toast(t('hf_bad_file'), 'err'); return; }
-        try {
-          const pv = await call('hr.empImport', { rows });
-          const ok = window.confirm(t('hf_import_q', { n: pv.rows, a: pv.new_rows, g: pv.gone, d: pv.dup_qid, q: pv.no_qid }));
-          if (!ok) return;
-          const r = await call('hr.empImport', { rows, apply: true });
-          toast(t('hf_import_done', { n: r.rows, l: r.linked }), 'ok'); empsBoard();
-        } catch (e) { toast(errText(e), 'err'); }
-      });
-      file.click();
-    } }, '⬆ ' + t('hf_import'));
-    box.replaceChildren(h('div.form-actions', upload), h('small.muted', t('hf_import_help')), status, h('p.empty', '…'));
+    box.replaceChildren(h('small.muted', t('hf_from_myfiles')), status, h('p.empty', '…'));
     try {
       const [list, users] = await Promise.all([call('hr.empList', {}), call('hr.empUsers', {}).catch(() => [])]);
       // every account (HR themselves included), the ones already linked last

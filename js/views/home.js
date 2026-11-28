@@ -1,7 +1,5 @@
 // Home: the first screen after sign-in. The screens this user may open (the same list as the menu,
-// so the same permissions), around the company's turning disc. The links are drawn at once; the disc
-// (js/disc.js + css/disc.css) is fetched after them, so it never holds them up, and it is removed
-// with this screen.
+// so the same permissions), in a grid. (The company's turning disc was taken away: the logo is in the top bar.)
 import { t } from '../i18n.js';
 import { h, icon, toast } from '../ui.js';
 import { Data } from '../data.js';
@@ -14,10 +12,9 @@ export function render(root, name, ctx) {
   dispose();
   const links = (ctx && ctx.links) || [];
   if (Data.user && Data.user.role === 'admin') return renderGrouped(root, links, ctx);
-  // around the disc from three screens up (wide screens only, css); fewer stay in a row under it
-  const ring = links.length >= 3;
+  // the screens in a grid (the turning disc was taken away on 2026-11-28: the logo is in the top bar)
+  const ring = false;
   const rtl = document.documentElement.dir === 'rtl';
-  const slot = h('div.home-disc', { 'aria-hidden': 'true' });
   const nav = h('nav.home-nav', { 'aria-label': t('home') }, links.map((r, i) => {
     // the screen left open behind the home screen (idle): marked, and brought back as it was
     const resume = ctx && ctx.resume && ctx.resume.name === r;
@@ -41,16 +38,9 @@ export function render(root, name, ctx) {
   }
   // department requests waiting for this user (the number is set with the badges)
   const note = links.includes('requests') ? h('a.home-note.home-note-req', { href: '#/requests', hidden: true }) : null;
-  root.replaceChildren(h('div.home', note, h('div.home-grid', sides[0], h('div.home-stage' + (ring ? '.ring' : ''), slot, nav), sides[1])));
+  root.replaceChildren(h('div.home', note, h('div.home-grid', sides[0], h('div.home-stage', nav), sides[1])));
 
-  let alive = true;
-  let unmount = null;
-  // after the links are painted: the disc, from its own files
-  requestAnimationFrame(() => setTimeout(() => {
-    if (!alive) return;
-    import('../disc.js').then((m) => { if (alive) unmount = m.mountDisc(slot); }).catch(() => { /* no disc offline: the links work */ });
-  }, 0));
-  cleanup = () => { alive = false; if (unmount) unmount(); unmount = null; };
+  cleanup = null;
 }
 
 export function dispose() { if (cleanup) cleanup(); cleanup = null; }
@@ -104,15 +94,9 @@ function renderGrouped(root, links, ctx) {
       }));
     drawWait();
   }
-  const slot = h('div.home-disc.home-disc-small', { 'aria-hidden': 'true' });
-  root.replaceChildren(h('div.home.home-admin', slot, waitBox, body));
+  root.replaceChildren(h('div.home.home-admin', waitBox, body));
   draw();
   const onCounts = () => drawWait();
   window.addEventListener('moro:badges', onCounts);
-  let alive = true, unmount = null;
-  requestAnimationFrame(() => setTimeout(() => {
-    if (!alive) return;
-    import('../disc.js').then((m) => { if (alive) unmount = m.mountDisc(slot); }).catch(() => {});
-  }, 0));
-  cleanup = () => { alive = false; window.removeEventListener('moro:badges', onCounts); if (unmount) unmount(); unmount = null; };
+  cleanup = () => { window.removeEventListener('moro:badges', onCounts); };
 }

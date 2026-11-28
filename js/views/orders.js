@@ -9,7 +9,7 @@ import { call } from '../api.js';
 import { Data, STORES } from '../data.js';
 import { t, errText } from '../i18n.js';
 import { h, toast, flash, fmtNum, fmtDate, trackFilled, dialog } from '../ui.js';
-import { combo, field, newId } from '../components.js';
+import { field, newId } from '../components.js';
 import { shrink, photoButton } from '../photos.js';
 import { Outbox } from '../outbox.js';
 
@@ -87,6 +87,12 @@ export async function render(root, name) {
   const SEEN_REJECTED = 'moro-div.orders.rejectedSeen';
   const seenRejected = () => { try { return localStorage.getItem(SEEN_REJECTED) || ''; } catch { return ''; } };
   function drawCounts(all) {
+    // the items this shop orders most (its recent orders): first in the catalogue
+    if (!approveMode) {
+      const f = {};
+      all.forEach((o) => (o.lines || []).forEach((l) => { if (l.item_id) f[l.item_id] = (f[l.item_id] || 0) + 1; }));
+      if (JSON.stringify(f) !== JSON.stringify(orderFreq)) { orderFreq = f; if (redrawCatalog) redrawCatalog(); }
+    }
     // the cashier: orders delivered to the shop, waiting to be received
     if (!approveMode) {
       const d = all.filter((o) => o.status === 'delivered').length;
@@ -124,20 +130,48 @@ export async function render(root, name) {
   let kind = 'normal';
   let sp = {};
   let source = 'all';        // the item picker: all, a store, or a department
+  let orderFreq = {};        // item → how many of this shop's recent orders had it
+  let redrawCatalog = null;
+  let srcOpen = '';          // which list of the picker is open: 'store', 'dept' or none
   function drawEditor() {
     // the stores (final products come by department) and the producing departments
     const depts = Data.producingDepts();
     const inSource = (i) => source === 'all' || (source.startsWith('s:') ? Data.storeOf(i) === source.slice(2) && Data.storeOf(i) !== 'FINAL'
       : Data.storeOf(i) === 'FINAL' && i.dept === source.slice(2));
-    const item = combo({ id: 'o-item', options: () => Data.activeItems().filter(inSource).sort((a, b) => Data.nameOf(a).localeCompare(Data.nameOf(b)))
-      .map((i) => ({ value: i.item_id, label: Data.nameOf(i), alt: i.name, hint: Data.qty(i.item_id) > 0 ? t('ord_available') : t('ord_not_available') })) });
-    // two searchable lists narrow the items: a store, or a department (choosing one clears the other; none = all)
-    const storeBox = combo({ id: 'o-store', placeholder: t('order_st_all'), options: () => STORES.filter((s) => s !== 'FINAL').map((s) => ({ value: s, label: t('store_' + s) })),
-      onPick: (v) => { if (v) { deptBox.clear(); source = 's:' + v; } else if (!deptBox.value) source = 'all'; item.clear(); } });
-    const deptBox = combo({ id: 'o-dept', placeholder: t('all_depts'), options: () => depts.map((p) => ({ value: p.party_id, label: p.name })),
-      onPick: (v) => { if (v) { storeBox.clear(); source = 'd:' + v; } else if (!storeBox.value) source = 'all'; item.clear(); } });
-    if (source.startsWith('s:')) storeBox.set(source.slice(2)); else if (source.startsWith('d:')) deptBox.set(source.slice(2));
-    const srcBar = h('div.form-grid.order-src', field(t('store'), storeBox), field(t('department'), deptBox));
+    // the item chosen on a card (POS): its quantity is typed in the bar that stays at hand
+    const item = { value: '', input: null, clear() { this.value = ''; drawCards(); } };
+    const srcName = () => (source.startsWith('s:') ? t('store_' + source.slice(2)) : source.startsWith('d:') ? ((Data.parties.get(source.slice(2)) || {}).name || '') : '');
+    const chip = (key, label) => h('button.chip' + (source === key ? '.on' : ''), { type: 'button', onclick: () => { source = source === key ? 'all' : key; srcOpen = ''; item.value = ''; drawSrc(); drawCards(); } }, label);
+    const storeList = h('div.pos-chips'), deptList = h('div.pos-chips');
+    const storeHead = h('button.pos-src-head', { type: 'button', onclick: () => { srcOpen = srcOpen === 'store' ? '' : 'store'; drawSrc(); } });
+    const deptHead = h('button.pos-src-head', { type: 'button', onclick: () => { srcOpen = srcOpen === 'dept' ? '' : 'dept'; drawSrc(); } });
+    const drawSrc = () => {
+      const isStore = source.startsWith('s:'), isDept = source.startsWith('d:');
+      storeHead.replaceChildren(h('span', (srcOpen === 'store' ? '▾ ' : '▸ ') + t('store')), isStore ? h('b', ' · ' + srcName()) : '');
+      deptHead.replaceChildren(h('span', (srcOpen === 'dept' ? '▾ ' : '▸ ') + t('department')), isDept ? h('b', ' · ' + srcName()) : '');
+      storeHead.classList.toggle('on', srcOpen === 'store' || isStore); deptHead.classList.toggle('on', srcOpen === 'dept' || isDept);
+      // one list open at a time: opening the store's folds the department's, and back
+      storeList.hidden = srcOpen !== 'store'; deptList.hidden = srcOpen !== 'dept';
+      storeList.replaceChildren(...STORES.filter((x) => x !== 'FINAL').map((x) => chip('s:' + x, t('store_' + x))));
+      deptList.replaceChildren(...depts.map((d) => chip('d:' + d.party_id, d.name)));
+    };
+    const find = trackFilled(h('input.input#o-find', { type: 'search', placeholder: t('pos_search') }));
+    const cards = h('div.pos-cards');
+    const drawCards = () => {
+      const q = find.value.trim().toLowerCase();
+      const list = Data.activeItems().filter(inSource).filter((i) => !q || (Data.nameOf(i) + ' ' + i.name).toLowerCase().includes(q))
+        // the most ordered first, then by name
+        .sort((a, b) => (orderFreq[b.item_id] || 0) - (orderFreq[a.item_id] || 0) || Data.nameOf(a).localeCompare(Data.nameOf(b)));
+      const inOrder = new Set(lines.map((l) => l.item_id));
+      cards.replaceChildren(...(list.length ? list.slice(0, 120).map((i) => h('button.pos-card' + (item.value === i.item_id ? '.on' : '') + (inOrder.has(i.item_id) ? '.in' : ''), { type: 'button',
+        onclick: () => { item.value = item.value === i.item_id ? '' : i.item_id; drawCards(); drawBar(); if (item.value) { qty.focus(); qty.select(); } } },
+        h('bdi.pos-name', Data.nameOf(i)), h('small.pos-unit', i.unit || ''),
+        h('span.pos-av.' + (Data.qty(i.item_id) > 0 ? 'in' : 'low'), Data.qty(i.item_id) > 0 ? t('ord_available') : t('ord_not_available')),
+        orderFreq[i.item_id] ? h('span.pos-hot', '★') : '')) : [h('p.empty', t('no_rows'))]));
+    };
+    find.addEventListener('input', drawCards);
+    redrawCatalog = () => { if (cards.isConnected) drawCards(); };
+    const srcBar = h('div.pos-src', h('div.pos-heads', storeHead, deptHead), storeList, deptList, find);
     const qty = trackFilled(h('input.input.num#o-qty', { type: 'number', step: 'any', min: 0 }));
     const note = trackFilled(h('input.input#o-note', { value: editing ? editing.note || '' : '' }));
     const body = h('tbody');
@@ -151,15 +185,14 @@ export async function render(root, name) {
       return h('tr', h('td.wrap', h('bdi', Data.nameOf(it))), h('td.num', fmtNum(l.qty) + ' ' + (it.unit || '')),
         h('td', Data.qty(l.item_id) > 0 ? h('span.pill.in', t('ord_available')) : h('span.pill.low', t('ord_not_available'))),
         h('td', h('button.link', { type: 'button', onclick: () => { lines.splice(i, 1); draw(); } }, t('delete'))));
-    }) : [h('tr', h('td.empty', { colspan: 4 }, t('no_lines')))]));
+    }) : [h('tr', h('td.empty', { colspan: 4 }, t('no_lines')))])) || (typeof drawBar === 'function' && drawBar());
     const add = () => {
-      if (!item.value) { flash(item.input); item.input.focus(); return; }
+      if (!item.value) { flash(cards); toast(t('pos_pick'), 'err'); return; }
       if (!(Number(qty.value) > 0)) { flash(qty); qty.focus(); return; }
       const same = lines.find((l) => l.item_id === item.value);
       if (same) same.qty = Math.round((same.qty + Number(qty.value)) * 1e6) / 1e6; else lines.push({ item_id: item.value, qty: Number(qty.value) });
-      item.clear(); qty.value = ''; qty.dispatchEvent(new Event('change')); draw(); item.input.focus();
+      item.value = ''; qty.value = ''; qty.dispatchEvent(new Event('change')); draw(); drawCards(); drawBar();
     };
-    item.input.addEventListener('keydown', (e) => { if (e.key === 'Enter' && item.value) { e.preventDefault(); qty.focus(); } });
     qty.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); add(); } });
     // ---- the special order: who, when, where, and the products described
     const special = kind === 'special';
@@ -202,7 +235,7 @@ export async function render(root, name) {
         field(t('photos'), files), h('div.field.end', addSpecialBtn))) : null;
     // something typed and not added to the order: it would be lost, so nothing is saved until it is added or cleared
     const pending = () => {
-      if (item.value || item.input.value.trim() || qty.value !== '') return addBtn;
+      if (item.value || qty.value !== '') return addBtn;
       if (special && (desc.value.trim() || sQty.value !== '' || price.value !== '' || files.files.length)) return addSpecialBtn;
       return null;
     };
@@ -226,7 +259,7 @@ export async function render(root, name) {
         toast(t('order_line_pending'), 'err');
         return;
       }
-      if (!lines.length) { flash(special ? desc : item.input); return; }
+      if (!lines.length) { flash(special ? desc : cards); return; }
       if (special) {
         keep();
         if (!sp.customer_name) return flash(cName);
@@ -255,8 +288,13 @@ export async function render(root, name) {
       } catch (e) { toast(errText(e), 'err'); btn.disabled = false; }
     };
     // the items of the list: always shown in a normal order; in a special order they open on demand
-    const catalogBox = h('div', srcBar, h('div.form-grid', field(t('item'), item, { wide: true }), field(t('qty'), qty),
-      h('div.field.end', addBtn)));
+    const catalogBox = h('div', srcBar, cards);
+    const barItem = h('div.pos-bar-item');
+    const drawBar = () => {
+      const it = item.value ? Data.items.get(item.value) : null;
+      barItem.replaceChildren(it ? h('bdi', Data.nameOf(it)) : h('span.muted', t('pos_pick_short')), it ? h('small.muted', ' ' + (it.unit || '')) : '',
+        h('small.pos-count', ' · ' + t('pos_lines', { n: lines.length })));
+    };
     const hasCatalog = lines.some((l) => l.item_id);
     catalogBox.hidden = special && !hasCatalog;
     const catalogToggle = special ? h('button.btn.secondary', { type: 'button', onclick: (e) => {
@@ -269,8 +307,10 @@ export async function render(root, name) {
       h('div.table-wrap', h('table', h('thead', h('tr', h('th', t('item')), h('th', t('qty')), h('th', ''), h('th', ''))), body)),
       h('div.form-actions',
         h('button.btn.secondary', { type: 'button', onclick: (e) => save(false, e.currentTarget) }, t('save_draft')),
-        h('button.btn.save-btn', { type: 'button', onclick: (e) => save(true, e.currentTarget) }, t('order_send')),
-        editing ? h('button.btn.secondary', { type: 'button', onclick: () => { editing = null; lines = []; sp = {}; kind = 'normal'; drawEditor(); } }, t('close')) : null)));
+        editing ? h('button.btn.secondary', { type: 'button', onclick: () => { editing = null; lines = []; sp = {}; kind = 'normal'; drawEditor(); } }, t('close')) : null),
+      // always at hand: the chosen item, its quantity, "add to the order" and "send the order"
+      h('div.pos-bar', barItem, h('div.pos-bar-row', qty, addBtn, h('button.btn.save-btn', { type: 'button', onclick: (e) => save(true, e.currentTarget) }, t('order_send'))))));
+    drawSrc(); drawCards(); drawBar();
     draw();
   }
 

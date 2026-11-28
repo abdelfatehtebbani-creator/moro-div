@@ -270,7 +270,7 @@ function buildShell() {
     guideFrom = currentName || '';
     location.hash = '#/guide?s=' + guideFrom;
   } }, '?');
-  shellEl = h('div.shell', side, h('div.main', h('header.topbar', title, help, h('div.spacer'),
+  shellEl = h('div.shell', side, h('div.main', h('header.topbar', h('img.top-logo', { src: 'icons/logo.png', alt: '', width: 34, height: 34 }), title, help, h('div.spacer'),
     // who is signed in, on every screen
     h('div.top-user', { title: Data.user.display_name + ' · ' + t('role_' + Data.user.role) }, h('span.top-user-ico', '👤'), h('bdi', Data.user.display_name)), syncEl,
     // the admin (and the developer's account): the version, the language and sign out always at hand

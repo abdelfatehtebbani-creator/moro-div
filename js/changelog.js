@@ -2,6 +2,17 @@
 // ("What's new"), with what they need to do. Newest first. Add an entry with every release.
 //   todo: for everyone; admin: only for users who manage users (the admin).
 export const CHANGELOG = [
+  { v: '0.9.300', date: '2026-11-28', ar: { news: [
+    '(نسخة التطوير) أُزيل القرص الدوار والساعة من الشاشة الرئيسية، وصار الشعار بحجم عادي في زاوية الشريط العلوي.',
+    '(نسخة التطوير) على الهاتف لم تعد الصفحة تتحرك يمينًا ويسارًا: الجداول العريضة تُمرَّر داخل إطارها.',
+    '(نسخة التطوير) دور جديد «مساعد»: يأخذه العامل الذي يفتح حسابه بنفسه كمساعد، ويطلب من المخزن لقسمه.',
+    '(نسخة التطوير) طلبية الكاشير: «المخزن» و«القسم» عنوانان يفتح كل منهما قائمته ويطوي الأخرى، والمواد بطاقات كنقطة البيع والأكثر طلبًا أولًا، وزرّا «إضافة إلى الإذن» و«إرسال الطلبية» ثابتان في أسفل الشاشة.',
+  ] }, en: { news: [
+    '(Development copy) The turning disc and the clock left the home screen; the logo sits, ordinary size, at the corner of the top bar.',
+    '(Development copy) On a phone the page no longer moves sideways: wide tables scroll inside their own box.',
+    '(Development copy) A new role, Assistant: a worker who opens their own account as a helper gets it, and asks the store for their department.',
+    '(Development copy) The cashier’s order: Store and Department are headings that each open their list and fold the other, the items are cards like a point of sale with the most ordered first, and Add to the order and Send the order stay at the bottom of the screen.',
+  ] } },
   { v: '0.9.299', date: '2026-11-24', ar: { news: [
     '(نسخة التطوير) زر «↗ فتح MyFiles» يظهر الآن لكل من في حسابه بريد MyFiles، لا للمدير وHR وحدهما. وزر MORO في MyFiles يظهر كذلك لمن له حساب في MORO فقط.',
   ] }, en: { news: [
